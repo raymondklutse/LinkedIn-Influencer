@@ -12,8 +12,71 @@ from matplotlib import pylab
 import numpy as np
 import pickle
 from collections import Counter
+############################## Rudresh ###############################################
+def list_of_different_attribute_values(d):
+    return set([v for values in d.values() for v in values])
+    
+def draw_graph(g, node_attribute=None, list_of_values_of_attributes=None):
+    """
+    Draw the graph g.
 
+    Parameters
+    ----------
+    g : graph
+       A networkx graph
+    node_attribute : string 
+       The name of the node attribute used to assign colors to the drawing
+    list_of_values_of_attributes : list
+        A list of all the potential values of node_attribute to assign one color
+        per value.
+    """
+    #initialze Figure
+    plt.figure(num=None, figsize=(20, 20), dpi=80)
+    plt.axis('off')
+    fig = plt.figure(1)
+    
+    pos = nx.spring_layout(g,iterations=50)
 
+    
+    if node_attribute and list_of_values_of_attributes: 
+        # To associate colors to nodes according to an attribute, here college
+        # build a color_map, one for each college
+        color_map={}
+        i=0.0
+        for s in list_of_values_of_attributes:
+            color_map[s]=i
+            i+=1/len(list_of_values_of_attributes)
+        color_map[None]=1 # for nodes without values for the attribute node_attribute
+        
+        # The values supplied to node_color should be in the same order as the nodes 
+        # listed in G.nodes(). We take an arbitrary mapping of values color_map and 
+        # generate the values list in the correct order
+        #values = [color_map[G.node[node].get(node_attribute)] for node in G.nodes()] # for attributes encoded in the graph
+        values=[]        
+        for node in G.nodes():
+            if node in node_attribute:
+                if node_attribute[node]:
+                    # we arbitrarily take the first value 
+                    values.append(color_map[node_attribute[node][0]])
+            else:
+                values.append(1)
+               
+        nx.draw_networkx_nodes(g,pos, cmap=plt.get_cmap('jet'), node_color=values)
+    else:
+        nx.draw_networkx_nodes(g,pos)
+    
+    nx.draw_networkx_edges(g,pos)
+    nx.draw_networkx_labels(g,pos)
+
+    cut = 1.00
+    xmax = cut * max(xx for xx, yy in pos.values())
+    ymax = cut * max(yy for xx, yy in pos.values())
+    plt.xlim(0, xmax)
+    plt.ylim(0, ymax)
+    plt.show()
+    pylab.close()
+    del fig
+############################## Rudresh ###############################################
 
 def naive_method(graph, empty, attr):
     """   Predict the missing attribute with a simple but effective
@@ -463,6 +526,22 @@ def findcommonneighbours(Graph):
          
 findcommonneighbours(G)    
 
+
+########################## RUdresh ###################################
+
+a = employer;
+draw_graph(G, node_attribute=a, list_of_values_of_attributes=list_of_different_attribute_values(a))
+
+# print some properties to understand the type of graph
+properties(G)
+# and compare with the ground truth (what you should have predicted)
+# user precision and recall measures
+
+A = nx.k_nearest_neighbors(G,'in+out','in+out', nodes='U9128', weight=None)
+A
+
+
+#######################################################################
 
 
 
