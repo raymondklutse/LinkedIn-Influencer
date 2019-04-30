@@ -203,7 +203,7 @@ print("Very poor result!!! Try to do better!!!!")
 
 # and compare with the ground truth (what you should have predicted)
 # user precision and recall measures
-    """
+"""
     empty_college: dict
         A dict containing all the nodes that don't have college data
         
@@ -300,7 +300,7 @@ def fulldata(dictionary_one,dictionary_two,dictionary_three):
                 
 fulldata(employer,location,college)
 
-  """
+"""
     empty_location_n_college_info: dict
         A dict containing all the nodes that don't have location and college data
         
@@ -393,13 +393,13 @@ multipledata(college,employer,college_n_employer_info,empty_college_n_employer_i
 neighbours = {}
 neighboursofneighbour = {}
 
-    """
+"""
     neighbours: dict
     A dict to store neighbours of a given node
     
     neighboursofneighbour: dict
     A dict to store neighbours of a given node in  neighbours
-    """
+"""
 
 def findneighbours(Graph):
     """
@@ -443,7 +443,7 @@ def printneighbourskeys(neighbours):
 
 def printneighbours(neighbours):
     
-     """
+    """
     Print the values of neighbour dictionary
     
     Parameters
@@ -460,7 +460,7 @@ def printneighbours(neighbours):
         print(neighbours[n][0])
         
 def printneighboursdegree(neighbours):
-     """
+    """
     Print the number of neighbours
     
     Parameters
@@ -477,7 +477,7 @@ def printneighboursdegree(neighbours):
 nodepositions = dict()
         
 def createnodepositions(Graph):
-       """
+    """
     Create numerical positions for each node in Graph
     
     Parameters
@@ -496,10 +496,10 @@ def createnodepositions(Graph):
         
 createnodepositions(G)   
 
-    """
-    commonneighbours: dict
-        A dict containing the common neighbours between two nodes. Key contains first node and second node
-    """
+"""
+  commonneighbours: dict
+      A dict containing the common neighbours between two nodes. Key contains first node and second node
+"""
 commonneighbours = dict()
 
 def findcommonneighbours(Graph):
@@ -518,27 +518,49 @@ def findcommonneighbours(Graph):
     """
     G = Graph
     i = 0
+    j = i+1
     for i in range(len(nodepositions) - 1):
-         node1 = nodepositions[i][0]
-         node2 = nodepositions[i+1][0]
-         commonneighbours[node1,node2] = sorted(nx.common_neighbors(G, node1, node2)),len(sorted(nx.common_neighbors(G, node1, node2)))
-         i = i + 1
+        for j in range(len(nodepositions) - 1):
+             node1 = nodepositions[i][0]
+             node2 = nodepositions[j][0]
+             if(len(sorted(nx.common_neighbors(G, node1, node2))) != 0):
+                 commonneighbours[node1,node2] = sorted(nx.common_neighbors(G, node1, node2)),len(sorted(nx.common_neighbors(G, node1, node2)))
+             j = j + 1
+        i = i + 1
          
 findcommonneighbours(G)    
 
+def findfirstkeycommonneighbors(commonneighbours):
+    """
+     Find the first key in common neighbours 
+    
+    Parameters
+    ----------
+     commonneighbours: dict
+        A dict containing the common neighbours between two nodes. Key contains first node and second node. 
+        The values consist of the list of common neighbours and the number of common neighbours
+        
+    Returns    
+    ----------
+   
+    """
 
+    for key, values in commonneighbours:
+        print(key[0])
+
+findfirstkeycommonneighbors(commonneighbours)
 ########################## RUdresh ###################################
 
 a = employer;
 draw_graph(G, node_attribute=a, list_of_values_of_attributes=list_of_different_attribute_values(a))
 
 # print some properties to understand the type of graph
-properties(G)
+#properties(G)
 # and compare with the ground truth (what you should have predicted)
 # user precision and recall measures
 
 A = nx.k_nearest_neighbors(G,'in+out','in+out', nodes='U9128', weight=None)
-A
+
 
 
 #######################################################################
