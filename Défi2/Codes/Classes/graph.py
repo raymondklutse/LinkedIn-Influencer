@@ -76,150 +76,7 @@ class graph(object):
         pylab.close()
         del fig
 
-    def emptydata(nodes, main_dictionary, empty_dictionary,no_empty_dictionary):
-        """
-        Find the nodes with missing data
-        
-        Parameters
-        ----------
-        nodes : dict
-        main_dictionary: dict
-        empty_dictionary : dict
-        no_empty_dictionary : dict
-        
-        Returns
-        ----------
-        empty_dictionary : dict
-            A dictory containing all the nodes with empty
-        
-        no_empty_dictionary : dict
-            A dictory containing all the nodes non empty
-        
-        """
-        for n in nodes:
-            if n in main_dictionary:
-                no_empty_dictionary[n] = main_dictionary[n]
-                
-            else:
-                 empty_dictionary[n] = None
-                 
-        """
-        full_data_info : dict
-            A dict containing all the nodes that have full data , ie location, employer,college
-        
-        empty_full_data_info: dict
-            A dict containing all the nodes that lack one or more of data , ie location, employer,college
-        """            
-   
-    
-    def fulldata(dictionary_one,dictionary_two,dictionary_three):
-        """
-        Find the nodes that have full data , ie location, employer,college
-            
-        Parameters
-        ----------
-        dictionary_one: dict
-            A dict to compare with dictionary_two and dictionary_three
-            
-        dictionary_two: dict
-            A dict to compare with dictionary_one and dictionary_three
-             
-        dictionary_three : dict
-            A dict to compare with dictionary_one and dictionary_two
-            
-        Returns
-        ----------
-        full_data_info : dict
-            A dict containing all the nodes that have full data , ie location, employer,college
-        
-        empty_full_data_info: dict
-            A dict containing all the nodes that lack one or more of data , ie location, employer,college
-        """
-        for n in dictionary_one:
-            if n in dictionary_two and n in dictionary_three:
-              
-                full_data_info[n] = (n,dictionary_one[n],dictionary_two[n],dictionary_three[n])
-                
-            if dictionary_one[n] is None and dictionary_two[n] is None and dictionary_three[n] is None:
-                    empty_full_data_info[n] = (n,None,None,None)
-                    
-    #fulldata(employer,location,college)
-    
-    """
-        empty_location_n_college_info: dict
-            A dict containing all the nodes that don't have location and college data
-            
-        empty_location_n_employer_info: dict
-            A dict containing all the nodes that don't have location and employer data
-            
-        empty_employer_n_college_info: dict
-            A dict containing all the nodes that don't have employer and college data
-            
-        empty_employer_n_location_info : dict
-            A dict containing all the nodes that don't have employer and location data
-            
-        empty_college_n_location_info: dict
-            A dict containing all the nodes that don't have college and location data
-            
-        empty_college_n_employer_info : dict
-            A dict containing all the nodes that don't have college and employer data
-                  
-        location_n_college_info: dict
-            A dict containing all the nodes that have location and college data
-            
-        location_n_employer_info: dict
-            A dict containing all the nodes that have location and employer data
-            
-        employer_n_college_info: dict
-            A dict containing all the nodes that have employer and college data
-            
-        employer_n_location_info : dict
-            A dict containing all the nodes that have employer and location data
-            
-        college_n_location_info: dict
-            A dict containing all the nodes that have college and location data
-            
-        college_n_employer_info : dict
-            A dict containing all the nodes that have college and employer data
-            
-    """
-    
-    def multipledata(dictionary_one,dictionary_two,no_empty_dictionary,empty_dictionary):
-        
-        """
-        Calculate the nodes that have a maximum of 2 values
-        
-        Parameters
-        ----------
-        dictionary_one:dict
-        dictionary_two:dict
-        no_empty_dictionary:dict
-        empty_dictionary : dict
-        Returns
-        ----------
-        no_empty_dictionary:dict
-        empty_dictionary : dict
-        
-        """
-      
-        for n in dictionary_one:
-            if n in dictionary_two:
-                no_empty_dictionary[n] = dictionary_one[n],dictionary_two[n]
-                print(n,dictionary_one[n],dictionary_two[n])   
-            else:
-                print(n,None,None)
-                empty_dictionary[n] = dictionary_one[n],None
-    
-    #multipledata(location,college,location_n_college_info,empty_location_n_college_info)
-    #multipledata(location,employer,location_n_employer_info,empty_location_n_employer_info)
-    #multipledata(employer,college,employer_n_college_info,empty_employer_n_college_info)
-    
-    #multipledata(college,location,college_n_location_info,empty_college_n_location_info)
-    #multipledata(employer,location,employer_n_location_info,empty_employer_n_location_info)
-    #multipledata(college,employer,college_n_employer_info,empty_college_n_employer_info)
-    
-    
-    
+
     """
         neighbours: dict
         A dict to store neighbours of a given node
@@ -315,21 +172,21 @@ class graph(object):
         ----------
             A list of nodes in graph and their respective numerical position
         """
-        
+        nodepositions = {}
         i = 0
         for n in Graph.nodes() :
             nodepositions[i] = n,i
             i = i + 1
-            
+        return nodepositions
     #createnodepositions(G)   
     
     """
       commonneighbours: dict
           A dict containing the common neighbours between two nodes. Key contains first node and second node
     """
-    commonneighbours = dict()
+   
     
-    def findcommonneighbours(Graph):
+    def findcommonneighbours(Graph,nodepositions):
         """`
          Find the common neighbours of two nodes in a graph
         
@@ -344,17 +201,18 @@ class graph(object):
             The values consist of the list of common neighbours and the number of common neighbours
         """
         G = Graph
+        commonneighbours = dict()
         i = 0
         j = i+1
-        for i in range(len(nodepositions) - 1):
-            for j in range(len(nodepositions) - 1):
+        for i in range(len(nodepositions)):
+            for j in range(len(nodepositions)):
                  node1 = nodepositions[i][0]
                  node2 = nodepositions[j][0]
                  if(len(sorted(nx.common_neighbors(G, node1, node2))) != 0):
                      commonneighbours[node1,node2] = sorted(nx.common_neighbors(G, node1, node2)),len(sorted(nx.common_neighbors(G, node1, node2)))
                  j = j + 1
             i = i + 1
-             
+        return  commonneighbours
     #findcommonneighbours(G)    
     
     def findfirstkeycommonneighbors(commonneighbours):

@@ -1,5 +1,11 @@
 import timeit
 from collections import Counter
+import markov_clustering as mc
+import community
+import networkx as nx
+import matplotlib.pyplot as plt
+import random
+import metrics as met
 
 class algorithms(object):
     """docstring for Algorithms"""
@@ -49,8 +55,125 @@ class algorithms(object):
                 a,nb_occurrence=max(cpt.items(), key=lambda t: t[1])
                 predicted_values[n].append(a)
         return predicted_values
+    def dijstrashortestpath(Graph):
+        shortestpaths = dict()
+        G = Graph
+    
+        i = 0
+        j = i+1
+        for i in range(len(nodepositions)):
+            for j in range(len(nodepositions)):
+                 node1 = nodepositions[i][0]
+                 node2 = nodepositions[j][0]
+                 if(len(sorted(nx.common_neighbors(G, node1, node2))) != 0):
+                     shortestpaths[node1,node2] = sorted(nx.common_neighbors(G, node1, node2)),len(sorted(nx.common_neighbors(G, node1, node2)))
+                 j = j + 1
+            i = i + 1
+        return  commonneighbours
+    
+    def centralitybetweeness(Graph):
+        G = Graph
+        bw_centrality = dict()
+        bw_centrality = nx.betweenness_centrality(G, normalized=False)
         
-     
+        return bw_centrality
+    
+    def markov_clustering(G,location,empty_nodes,groundtruth_location):
+        
+              # cluster using the optimized cluster inflation value
+        matrix = nx.to_scipy_sparse_matrix(G)
+        result = mc.run_mcl(matrix, inflation=1.5)
+        clusters = mc.get_clusters(result)  
+        
+        # to obrain the list of the nodes in the list
+        x = list(G.nodes())
+        
+        # to find the cordinates of the nodes
+        pos = nx.spring_layout(G,iterations=50)
+        
+        dicts= {}
+        
+        for i in range(len(pos)):
+            dicts[i]=pos[x[i]]
+        
+        # draw the clustered graph
+        mc.draw_graph(matrix, clusters, pos=dicts, node_size=50, with_labels=False, edge_color="silver")
+         ################################################################################
+        
+        
+        # to obtain the details regarding the employer,location college of particular node in dictionary
+        ### to predict the location
+        x = list(G.nodes())
+        predicted_values={}
+        for i in clusters:
+            dict_details = {}
+            for a in i:
+                if x[a] not in location:
+                    w = None
+                else:
+                    w = location[x[a]]
+                dict_details[a]= (w)
+           
+            for a in dict_details:
+                if dict_details[a] is None and x[a] in empty_nodes:
+                    nbrs_attr_values=[] 
+                    for b in G.neighbors(x[a]):
+                        node = x.index(b)
+                        if node in i and dict_details[node] is not None and b in location:
+                            for val in location[b]:
+                                nbrs_attr_values.append(val)                    
+                                predicted_values[x[a]]=[]
+                                if nbrs_attr_values: # non empty list
+                                    # count the number of occurrence each value and returns a dict
+                                    cpt=Counter(nbrs_attr_values)
+                                    # take the most represented attribute value among neighbors
+                                    b,nb_occurrence=max(cpt.items(), key=lambda t: t[1])
+                                    predicted_values[x[a]].append(b)
+        
+        #print("Print predicted value",predicted_values)
+        result = met.metrics.evaluation_accuracy(groundtruth_location,predicted_values)
+        print("%f%% of the predictions are true" % result)
+        return predicted_values
+        #return predicted_values
+    def louvain_clustering(G,location,empty_nodes,groundtruth_location):
+        partition = community.best_partition(G)
+
+        size = float(len(set(partition.values())))
+        pos = nx.spring_layout(G)
+        count = 0.
+        clusters=[]
+        for com in set(partition.values()) :
+            count = count + 1.
+            list_nodes = [nodes for nodes in partition.keys() if partition[nodes] == com]
+            clusters.append(list_nodes)
+            nx.draw_networkx_nodes(G, pos, list_nodes, node_size = 20,node_color = str(count / size))
+        nx.draw_networkx_edges(G, pos, alpha=0.5)
+        plt.show()
+        predicted_values={}
+        for i in clusters:
+            dict_details = {}
+            for a in i:
+                if a not in location:
+                    w = None
+                else:
+                    w = location[a]
+                dict_details[a]= (w)
+            for a in dict_details:
+                if dict_details[a] is None and a in empty_nodes:
+                    nbrs_attr_values=[] 
+                    for b in G.neighbors(a):
+                        if b in i and dict_details[b] is not None and b in location:
+                            for val in location[b]:
+                                nbrs_attr_values.append(val)                    
+                                predicted_values[a]=[]
+                                if nbrs_attr_values: # non empty list
+                                    # count the number of occurrence each value and returns a dict
+                                    cpt=Counter(nbrs_attr_values)
+                                    # take the most represented attribute value among neighbors
+                                    b,nb_occurrence=max(cpt.items(), key=lambda t: t[1])
+                                    predicted_values[a].append(b)
+        return predicted_values
+                 
     def getMean(values):
         mean=0
         numsum=0
